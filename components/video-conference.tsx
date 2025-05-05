@@ -51,8 +51,9 @@ export default function VideoConference() {
     <div className="w-full max-w-7xl rounded-xl bg-black shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-4">
-        <div className="h-6 sm:h-8 w-auto">
-          <Image src="/neo-logo.png" alt="Neo Logo" width={32} height={32} className="h-6 sm:h-8 w-auto" />
+        <div className="flex justify-between items-center">
+          <Image src="/neo-logo.png" alt="Neo Logo" width={100} height={100} className="" /> 
+          <p className="text-white text-3xl font-semibold pb-2 ">x Harsingh</p>
         </div>
         <div className="flex gap-2 sm:gap-4">
           <Button

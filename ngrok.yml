@@ -1,0 +1,9 @@
+version: "2"
+authtoken: 2wb6KFRbPxmfLocsWTRRxDCl7vU_3sCtY7UZxqsWM67xRFdZ5  # Replace with your actual auth token
+tunnels:
+  next:
+    addr: 3000
+    proto: http
+  socket:
+    addr: 3001
+    proto: http

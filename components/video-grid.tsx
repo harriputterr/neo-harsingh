@@ -2,13 +2,14 @@
 
 import VideoParticipant, { type Participant } from "./video-participant"
 
-interface VideoGridProps {
+export interface VideoGridProps {
   participants: Participant[]
   selectedParticipantId?: string | null
   onParticipantClick: (participantId: string) => void
   isFullscreen?: boolean
   isThumbnail?: boolean
   isMobile?: boolean
+  fillContainer?: boolean
 }
 
 export default function VideoGrid({
@@ -18,6 +19,7 @@ export default function VideoGrid({
   isFullscreen = false,
   isThumbnail = false,
   isMobile = false,
+  fillContainer = false,
 }: VideoGridProps) {
   // If no participants, return empty
   if (participants.length === 0) return null
@@ -26,7 +28,7 @@ export default function VideoGrid({
   if (participants.length === 1 || isFullscreen) {
     return (
       <div
-        className={`w-full ${isThumbnail ? "" : "cursor-pointer"}`}
+        className={`w-full ${fillContainer ? "h-full" : ""} ${isThumbnail ? "" : "cursor-pointer"}`}
         onClick={() => !isThumbnail && onParticipantClick(participants[0].id)}
       >
         <VideoParticipant
@@ -35,6 +37,7 @@ export default function VideoGrid({
           isSelected={participants[0].id === selectedParticipantId}
           isThumbnail={isThumbnail}
           isMobile={isMobile}
+          fillContainer={fillContainer}
         />
       </div>
     )
@@ -43,13 +46,18 @@ export default function VideoGrid({
   // For 2 participants, show them side by side (or stacked on very small screens)
   if (participants.length === 2) {
     return (
-      <div className={`grid ${isMobile ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2"} gap-2`}>
+      <div className={`grid ${isMobile ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2"} gap-2 w-full h-full`}>
         {participants.map((participant) => (
-          <div key={participant.id} className="cursor-pointer" onClick={() => onParticipantClick(participant.id)}>
+          <div
+            key={participant.id}
+            className="cursor-pointer h-full"
+            onClick={() => onParticipantClick(participant.id)}
+          >
             <VideoParticipant
               participant={participant}
               isSelected={participant.id === selectedParticipantId}
               isMobile={isMobile}
+              fillContainer={fillContainer}
             />
           </div>
         ))}
@@ -60,13 +68,14 @@ export default function VideoGrid({
   // For 3-4 participants, show in a 2x2 grid (or 1x4 on very small screens)
   if (participants.length <= 4) {
     return (
-      <div className={`grid ${isMobile ? "grid-cols-1 xs:grid-cols-2" : "grid-cols-2"} gap-2`}>
+      <div className={`grid ${isMobile ? "grid-cols-1 xs:grid-cols-2" : "grid-cols-2"} gap-2 w-full h-full`}>
         {participants.map((participant) => (
           <div key={participant.id} className="cursor-pointer" onClick={() => onParticipantClick(participant.id)}>
             <VideoParticipant
               participant={participant}
               isSelected={participant.id === selectedParticipantId}
               isMobile={isMobile}
+              fillContainer={fillContainer}
             />
           </div>
         ))}
@@ -77,13 +86,14 @@ export default function VideoGrid({
   // For 5-6 participants, show in a 3x2 grid (or 2x3 on mobile)
   if (participants.length <= 6) {
     return (
-      <div className={`grid ${isMobile ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-3"} gap-2`}>
+      <div className={`grid ${isMobile ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-3"} gap-2 w-full h-full`}>
         {participants.map((participant) => (
           <div key={participant.id} className="cursor-pointer" onClick={() => onParticipantClick(participant.id)}>
             <VideoParticipant
               participant={participant}
               isSelected={participant.id === selectedParticipantId}
               isMobile={isMobile}
+              fillContainer={fillContainer}
             />
           </div>
         ))}
@@ -93,13 +103,14 @@ export default function VideoGrid({
 
   // For more participants, show in a 3x3 grid or more (or 2x4+ on mobile)
   return (
-    <div className={`grid ${isMobile ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-3"} gap-2`}>
+    <div className={`grid ${isMobile ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-3"} gap-2 w-full h-full`}>
       {participants.map((participant) => (
         <div key={participant.id} className="cursor-pointer" onClick={() => onParticipantClick(participant.id)}>
           <VideoParticipant
             participant={participant}
             isSelected={participant.id === selectedParticipantId}
             isMobile={isMobile}
+            fillContainer={fillContainer}
           />
         </div>
       ))}
