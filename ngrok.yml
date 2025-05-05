@@ -1,9 +1,13 @@
-version: "2"
-authtoken: 2wb6KFRbPxmfLocsWTRRxDCl7vU_3sCtY7UZxqsWM67xRFdZ5  # Replace with your actual auth token
+version: 2
+authtoken: 2wb6KFRbPxmfLocsWTRRxDCl7vU_3sCtY7UZxqsWM67xRFdZ5  # Replace with your actual ngrok auth token
+
 tunnels:
-  next:
-    addr: 3000
+  signaling-server:
+    addr: 8000  # The port your signaling server runs on
     proto: http
-  socket:
-    addr: 3001
+    inspect: false  # Disable request inspection for better performance
+    
+  web-app:
+    addr: 3000  # The port your Next.js app runs on
     proto: http
+    inspect: false

@@ -13,7 +13,7 @@
     "generate-cert": "node scripts/generate-cert.js",
     "server": "nodemon server/server.js",
     "server:https": "cross-env USE_HTTPS=true node server/server.js",
-    "ngrok": "ngrok start --config=ngrok.yml next socket",
+    "ngrok": "ngrok start --config=ngrok.yml signaling-server web-app",
     "test:socket": "node scripts/test-socket.js"
   },
   "dependencies": {

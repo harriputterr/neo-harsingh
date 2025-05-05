@@ -29,11 +29,6 @@ export default function RoomPage() {
 
       socket?.emit("room:join", { username, roomId });
 
-      // Store username in sessionStorage for use in the conference room
-      sessionStorage.setItem("username", username);
-
-      // Navigate to the room
-      // router.push(`/room/${roomId}`);
     },
     [username, roomId, socket]
   );
