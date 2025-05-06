@@ -14,7 +14,7 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
-  const socket = useMemo(() => io("localhost:8000"), []);
+  const socket = useMemo(() => io("https://harsingh.ca"), []);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
