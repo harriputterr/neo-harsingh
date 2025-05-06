@@ -45,7 +45,7 @@ export class SocketService {
 
   private log(...args: any[]) {
     if (this.debug) {
-      console.log("[Socket]", ...args)
+
     }
   }
 

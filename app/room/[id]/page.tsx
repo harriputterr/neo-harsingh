@@ -40,13 +40,13 @@ export default function RoomPage() {
   }, [remoteSocketId, socket])
 
   const handleUserJoined = useCallback(({ username, id }: any) => {
-    console.log(`Username ${username} joined room`)
+
     setRemoteSocketId(id)
   }, [])
 
   const handleIncomingCall = useCallback(
     async ({ from, offer }: any) => {
-      console.log("Incoming call from:", from)
+
       setRemoteSocketId(from)
       setConnectionStatus("Incoming call...")
 
@@ -77,13 +77,13 @@ export default function RoomPage() {
 
   // We don't need sendStreams anymore since we're adding tracks before creating offer/answer
   const handleCallAccepted = useCallback(({ from, ans }: any) => {
-    console.log("Call accepted by:", from)
+
     peer.setLocalDescription(ans)
     setConnectionStatus("Connected")
   }, [])
 
   const handleNegoNeeded = useCallback(async () => {
-    console.log("Negotiation needed")
+
     try {
       const offer = await peer.getOffer()
       socket?.emit("peer:nego:needed", { offer, to: remoteSocketId })
@@ -94,7 +94,7 @@ export default function RoomPage() {
 
   const handleNegoNeedIncoming = useCallback(
     async ({ from, offer }: any) => {
-      console.log("Incoming negotiation from:", from)
+
       try {
         const ans = await peer.getAnswer(offer)
         socket?.emit("peer:nego:done", { to: from, ans })
@@ -106,7 +106,7 @@ export default function RoomPage() {
   )
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: any) => {
-    console.log("Final negotiation step")
+
     try {
       await peer.setLocalDescription(ans)
     } catch (error) {
@@ -119,7 +119,7 @@ export default function RoomPage() {
     // Set up ICE candidate handling
     const handleICECandidate = (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate) {
-        console.log("New ICE candidate:", event.candidate)
+
         socket?.emit("ice:candidate", {
           to: remoteSocketId,
           candidate: event.candidate,
@@ -128,7 +128,7 @@ export default function RoomPage() {
     }
 
     const handleICEConnectionStateChange = () => {
-      console.log("ICE connection state:", peer.peer.iceConnectionState)
+
       setConnectionStatus(peer.peer.iceConnectionState)
     }
 
@@ -144,10 +144,10 @@ export default function RoomPage() {
   // Handle incoming ICE candidates
   useEffect(() => {
     const handleIncomingICECandidate = async ({ from, candidate }: any) => {
-      console.log("Received ICE candidate from:", from)
+
       try {
         await peer.peer.addIceCandidate(new RTCIceCandidate(candidate))
-        console.log("Added ICE candidate")
+
       } catch (error) {
         console.error("Error adding ICE candidate:", error)
       }
@@ -162,10 +162,10 @@ export default function RoomPage() {
 
   useEffect(() => {
     peer.peer.addEventListener("track", async (ev) => {
-      console.log("Got remote track:", ev.track.kind)
+
       const remoteStream = ev.streams
       if (remoteStream[0]) {
-        console.log("Setting remote stream")
+
         setRemoteStream(remoteStream[0])
       }
     })

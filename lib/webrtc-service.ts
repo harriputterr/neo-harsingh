@@ -30,7 +30,7 @@ export class WebRTCService {
 
   private log(...args: any[]) {
     if (this.debug) {
-      console.log("[WebRTC]", ...args)
+
     }
   }
 

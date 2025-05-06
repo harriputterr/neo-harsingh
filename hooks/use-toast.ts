@@ -145,7 +145,7 @@ type ToastOptions = {
 
 export function toast(props: ToastOptions) {
   // In a real implementation, this would use a toast library
-  console.log(`Toast: ${props.title} - ${props.description}`)
+
   alert(`${props.title}\n${props.description || ""}`)
 }
 

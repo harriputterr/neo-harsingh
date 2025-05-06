@@ -17,7 +17,6 @@ export default function RoomPage() {
   const router = useRouter();
 
   const socket = useSocket();
-  console.log(socket);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -36,7 +35,7 @@ export default function RoomPage() {
   const handleJoinRoom = useCallback(
     (data:any) => {
       const { username, roomId } = data;
-      console.log(username,)
+
       router.push(`/room/${roomId}`);
     },
     [router]

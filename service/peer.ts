@@ -23,15 +23,15 @@ class PeerService {
 
     // Log connection state changes for debugging
     this.peer.addEventListener("connectionstatechange", () => {
-      console.log("Connection state changed:", this.peer.connectionState)
+
     })
 
     this.peer.addEventListener("signalingstatechange", () => {
-      console.log("Signaling state changed:", this.peer.signalingState)
+
     })
 
     this.peer.addEventListener("iceconnectionstatechange", () => {
-      console.log("ICE connection state changed:", this.peer.iceConnectionState)
+
     })
   }
 
