@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useSocket } from "@/providers/SocketProvider"
 import peer from "@/service/peer"
 import ReactPlayer from "react-player"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, Camera, CameraOff, Mic, MicOff, PhoneCall, PhoneOff } from "lucide-react"
@@ -21,6 +22,13 @@ export default function RoomPage() {
   const [isAudioOnly, setIsAudioOnly] = useState(false)
   const [isCameraEnabled, setIsCameraEnabled] = useState(true)
   const [isMicEnabled, setIsMicEnabled] = useState(true)
+  const [username, setUsername] = useState<string>("")
+
+  // Get username from session storage
+  useEffect(() => {
+    const storedUsername = sessionStorage.getItem("username") || "User"
+    setUsername(storedUsername)
+  }, [])
 
   // Function to get user media with progressive fallbacks
   const getUserMedia = useCallback(async (audioOnly = false) => {
@@ -383,125 +391,177 @@ export default function RoomPage() {
   }, [myStream, remoteSocketId, socket, router])
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Room: {roomId}</h1>
-        <div className="flex items-center gap-2">
-          <span
-            className={`px-2 py-1 rounded text-sm ${
-              connectionStatus === "connected"
-                ? "bg-green-500"
-                : connectionStatus === "connecting"
-                  ? "bg-yellow-500"
-                  : connectionStatus === "disconnected"
-                    ? "bg-red-500"
-                    : "bg-gray-500"
-            }`}
-          >
-            {connectionStatus}
-          </span>
-        </div>
-      </div>
-
-      {/* Error message */}
-      {errorMessage && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{errorMessage}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Audio only indicator */}
-      {isAudioOnly && myStream && (
-        <Alert className="mb-4 bg-yellow-500/20 border-yellow-500 text-yellow-500">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Audio Only Mode</AlertTitle>
-          <AlertDescription>Your call is in audio-only mode. Video could not be enabled.</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-        {/* My Stream */}
-        <div className="relative bg-gray-900 rounded-lg overflow-hidden">
-          {myStream ? (
-            isAudioOnly ? (
-              <div className="flex items-center justify-center h-full aspect-video bg-gray-800">
-                <div className="text-center">
-                  <CameraOff className="h-16 w-16 mx-auto mb-2 text-gray-400" />
-                  <p>Audio Only</p>
-                </div>
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <header className="px-6 py-4 bg-black/40 backdrop-blur-sm border-b border-gray-800">
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold">
+              <span className="text-gray-400">Room:</span> {roomId}
+            </h1>
+            {connectionStatus === 'Connected' && (
+              <div className="hidden md:flex items-center">
+                <span className="h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse" />
+                <span className="text-sm text-gray-300">Live</span>
               </div>
-            ) : (
+            )}
+          </div>
+          <div className="flex items-center">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                connectionStatus === 'connected'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : connectionStatus === 'connecting'
+                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                  : connectionStatus === 'disconnected'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+              }`}
+            >
+              {connectionStatus}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 p-4 md:p-6 flex flex-col">
+        {errorMessage && (
+          <Alert variant="destructive" className="mb-4 max-w-3xl mx-auto w-full">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {isAudioOnly && myStream && (
+          <Alert className="mb-4 max-w-3xl mx-auto w-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Audio Only Mode</AlertTitle>
+            <AlertDescription>Your call is in audio-only mode. Video could not be enabled.</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-1 max-w-7xl mx-auto w-full">
+          {/* My Stream */}
+          <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent" />
+            {myStream && !isAudioOnly ? (
               <div className="aspect-video w-full">
                 <ReactPlayer playing muted width="100%" height="100%" url={myStream} className="rounded-lg" />
               </div>
-            )
-          ) : (
-            <div className="flex items-center justify-center h-full aspect-video">
-              <p>Your camera is off</p>
-            </div>
-          )}
-          <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full">You</div>
-        </div>
-
-        {/* Remote Stream */}
-        <div className="relative bg-gray-900 rounded-lg overflow-hidden">
-          {remoteStream ? (
-            <div className="aspect-video w-full">
-              <ReactPlayer playing width="100%" height="100%" url={remoteStream} className="rounded-lg" />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-full aspect-video">
-              <p>Waiting for other participant...</p>
-            </div>
-          )}
-          {remoteStream && (
-            <div className="absolute bottom-4 left-4 bg-black/50 px-3 py-1 rounded-full">Remote User</div>
-          )}
-        </div>
-      </div>
-
-      {/* Call controls */}
-      <div className="mt-4 flex justify-center gap-4">
-        {!myStream && remoteSocketId && (
-          <Button
-            onClick={handleCallUser}
-            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-full font-medium"
-          >
-            <PhoneCall className="mr-2 h-4 w-4" />
-            Start Call
-          </Button>
-        )}
-
-        {myStream && (
-          <>
-            <Button
-              onClick={toggleMic}
-              variant="outline"
-              className="rounded-full"
-              title={isMicEnabled ? "Mute microphone" : "Unmute microphone"}
-            >
-              {isMicEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-            </Button>
-
-            {!isAudioOnly && (
-              <Button
-                onClick={toggleCamera}
-                variant="outline"
-                className="rounded-full"
-                title={isCameraEnabled ? "Turn off camera" : "Turn on camera"}
-              >
-                {isCameraEnabled ? <Camera className="h-4 w-4" /> : <CameraOff className="h-4 w-4" />}
-              </Button>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full aspect-video">
+                <div className=" shadow-teal-500/20">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-MkpOJg8WrwqDL7ipni67053iHQbPHh.png"
+                    alt="Profile"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                {isAudioOnly && myStream && (
+                  <p className="mt-4 text-gray-300">Audio Only Mode</p>
+                )}
+              </div>
             )}
+            <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full flex items-center space-x-2">
+              <div className="h-2 w-2 rounded-full bg-teal-500" />
+              <span className="text-sm font-medium">{username || 'You'}</span>
+            </div>
+            {myStream && (
+              <div className="absolute top-4 right-4 flex space-x-2">
+                {!isMicEnabled && (
+                  <div className="bg-red-500/80 p-1.5 rounded-full">
+                    <MicOff className="h-3.5 w-3.5" />
+                  </div>
+                )}
+                {!isCameraEnabled && !isAudioOnly && (
+                  <div className="bg-red-500/80 p-1.5 rounded-full">
+                    <CameraOff className="h-3.5 w-3.5" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-            <Button onClick={handleEndCall} className="bg-red-600 hover:bg-red-700 rounded-full" title="End call">
-              <PhoneOff className="h-4 w-4" />
-            </Button>
-          </>
-        )}
-      </div>
+          {/* Remote Stream */}
+          <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent" />
+            {remoteStream ? (
+              <div className="aspect-video w-full">
+                <ReactPlayer playing width="100%" height="100%" url={remoteStream} className="rounded-lg" />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full aspect-video">
+                <div className="border-pink-500/70 shadow-lg shadow-pink-500/20">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-XGNGAY6vunhQVhQCU5C4gBUijdSQ3p.png"
+                    alt="Remote Profile"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="mt-4 text-gray-300">
+                  {remoteSocketId ? 'Waiting for video...' : 'Waiting for someone to join...'}
+                </p>
+              </div>
+            )}
+            <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full flex items-center space-x-2">
+              <div className="h-2 w-2 rounded-full bg-pink-500" />
+              <span className="text-sm font-medium">{remoteSocketId ? 'Remote User' : 'Waiting for user...'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <div className="bg-black/60 backdrop-blur-md border border-gray-800 rounded-full p-2 shadow-xl">
+            {!myStream && remoteSocketId ? (
+              <Button
+                onClick={handleCallUser}
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-full font-medium shadow-lg shadow-green-900/30 transition-all duration-300"
+              >
+                <PhoneCall className="mr-2 h-5 w-5" />
+                Start Call
+              </Button>
+            ) : myStream ? (
+              <div className="flex items-center space-x-3 px-2">
+                <Button
+                  onClick={toggleMic}
+                  variant={isMicEnabled ? 'outline' : 'destructive'}
+                  className={`rounded-full h-12 w-12 flex items-center justify-center ${
+                    isMicEnabled ? 'bg-gray-800 hover:bg-gray-700 border-gray-600' : 'bg-red-500/20 hover:bg-red-500/30'
+                  }`}
+                  title={isMicEnabled ? 'Mute microphone' : 'Unmute microphone'}
+                >
+                  {isMicEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
+                </Button>
+
+                {!isAudioOnly && (
+                  <Button
+                    onClick={toggleCamera}
+                    variant={isCameraEnabled ? 'outline' : 'destructive'}
+                    className={`rounded-full h-12 w-12 flex items-center justify-center ${
+                      isCameraEnabled
+                        ? 'bg-gray-800 hover:bg-gray-700 border-gray-600'
+                        : 'bg-red-500/20 hover:bg-red-500/30'
+                    }`}
+                    title={isCameraEnabled ? 'Turn off camera' : 'Turn on camera'}
+                  >
+                    {isCameraEnabled ? <Camera className="h-5 w-5" /> : <CameraOff className="h-5 w-5" />}
+                  </Button>
+                )}
+
+                <Button
+                  onClick={handleEndCall}
+                  className="bg-red-600 hover:bg-red-700 rounded-full h-12 w-12 flex items-center justify-center shadow-lg shadow-red-900/30"
+                  title="End call"
+                >
+                  <PhoneOff className="h-5 w-5" />
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
