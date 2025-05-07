@@ -74,7 +74,7 @@ export default function RoomPage() {
             className="text-6xl font-serif text-white pb-2"
             style={{ letterSpacing: "-0.02em" }}
           >
-            nevio
+            niveo
           </h1>
           <div className="h-0.5 w-32 mx-auto bg-white/30"></div>
           <p className="mt-3 text-gray-400">Video Conference Platform</p>
